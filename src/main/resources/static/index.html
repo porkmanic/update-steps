@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>版本更新步骤管理系统</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Google Fonts Inter removed for offline support -->
+    <link href="/lib/quill.snow.css" rel="stylesheet">
+</head>
+
+<body>
+    <!-- 登录页面 -->
+    <div id="login-page" class="page">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h1>版本更新步骤管理</h1>
+                    <p class="subtitle">统一登记投产更新步骤，避免遗漏</p>
+                </div>
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="username">用户名</label>
+                        <input type="text" id="username" name="username" required placeholder="请输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" id="password" name="password" required placeholder="请输入密码">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">登 录</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主页面 -->
+    <div id="main-page" class="page hidden">
+        <!-- 顶部导航 -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo-small">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <h1>版本更新步骤管理</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <span class="user-badge" id="user-role"></span>
+                    <span id="user-name"></span>
+                </div>
+                <button class="btn btn-ghost" id="change-password-btn">修改密码</button>
+                <button class="btn btn-ghost" id="logout-btn">退出</button>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <!-- 侧边栏 -->
+            <aside class="sidebar">
+                <nav class="nav-menu">
+                    <a href="#" class="nav-item active" data-view="versions">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        开发中版本
+                    </a>
+                    <a href="#" class="nav-item" data-view="archived">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                        </svg>
+                        历史版本
+                    </a>
+                    <a href="#" class="nav-item admin-only" data-view="users">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path
+                                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        用户管理
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- 内容区域 -->
+            <main class="content">
+                <!-- 版本列表视图 -->
+                <div id="versions-view" class="view">
+                    <div class="view-header">
+                        <h2>开发中的版本</h2>
+                        <button class="btn btn-primary admin-only" id="create-version-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 4v16m8-8H4" />
+                            </svg>
+                            新建版本
+                        </button>
+                    </div>
+                    <div id="versions-list" class="versions-grid"></div>
+                </div>
+
+                <!-- 归档版本视图 -->
+                <div id="archived-view" class="view hidden">
+                    <div class="view-header">
+                        <h2>历史版本</h2>
+                    </div>
+                    <div id="archived-list" class="versions-grid"></div>
+                </div>
+
+                <!-- 用户管理视图 -->
+                <div id="users-view" class="view hidden">
+                    <div class="view-header">
+                        <h2>用户管理</h2>
+                        <button class="btn btn-primary" id="create-user-btn">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 4v16m8-8H4" />
+                            </svg>
+                            添加用户
+                        </button>
+                    </div>
+                    <div id="users-list" class="users-table-container"></div>
+                </div>
+
+                <!-- 版本详情视图 -->
+                <div id="version-detail-view" class="view hidden">
+                    <div class="view-header">
+                        <button class="btn btn-ghost back-btn" id="back-to-list">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M15 19l-7-7 7-7" />
+                            </svg>
+                            返回
+                        </button>
+                        <div class="version-title-section">
+                            <h2 id="version-title"></h2>
+                            <span class="status-badge" id="version-status"></span>
+                        </div>
+                        <div class="version-actions">
+                            <button class="btn btn-secondary admin-only" id="uat-btn">开始UAT</button>
+                            <button class="btn btn-warning admin-only" id="archive-btn">归档</button>
+                        </div>
+                    </div>
+                    <div class="steps-section">
+                        <div class="steps-header">
+                            <div style="display: flex; align-items: center; gap: 16px;">
+                                <h3>更新步骤</h3>
+                                <label class="toggle-switch"
+                                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.875rem; color: var(--text-secondary);">
+                                    <input type="checkbox" id="filter-my-steps" onchange="toggleMyStepsFilter()">
+                                    <span class="toggle-slider"></span>
+                                    只看自己
+                                </label>
+                            </div>
+                            <button class="btn btn-primary" id="add-step-btn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 4v16m8-8H4" />
+                                </svg>
+                                添加步骤
+                            </button>
+                        </div>
+                        <div id="steps-list" class="steps-container"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 id="modal-title"></h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <div class="modal-footer" id="modal-footer"></div>
+        </div>
+    </div>
+
+    <!-- Toast通知 - 移到右下角 -->
+    <div id="toast-container" class="toast-bottom-right"></div>
+
+    <script src="/lib/quill.min.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+
+</html>

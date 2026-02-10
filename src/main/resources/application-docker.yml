@@ -1,0 +1,27 @@
+# 数据库配置 - Docker环境使用/data目录
+spring:
+  datasource:
+    url: jdbc:sqlite:/data/updatesteps.db
+    driver-class-name: org.sqlite.JDBC
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    database-platform: org.hibernate.community.dialect.SQLiteDialect
+
+# 上传文件路径
+app:
+  upload:
+    path: /data/uploads
+  jwt:
+    secret: updatesteps-jwt-secret-key-2024-production
+    expiration: 86400000
+  admin:
+    password: nbcb,111
+
+server:
+  port: 8080
+
+logging:
+  level:
+    root: INFO
