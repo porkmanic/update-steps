@@ -1,14 +1,9 @@
 package com.example.updatesteps.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+
 import java.time.LocalDateTime;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "versions")
 public class Version {
@@ -31,6 +26,67 @@ public class Version {
 
     @Column(name = "archived_at")
     private LocalDateTime archivedAt;
+
+    public Version() {
+    }
+
+    public Version(Long id, String versionNumber, Status status, LocalDateTime createdAt, LocalDateTime uatAt,
+            LocalDateTime archivedAt) {
+        this.id = id;
+        this.versionNumber = versionNumber;
+        this.status = status;
+        this.createdAt = createdAt;
+        this.uatAt = uatAt;
+        this.archivedAt = archivedAt;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getVersionNumber() {
+        return versionNumber;
+    }
+
+    public void setVersionNumber(String versionNumber) {
+        this.versionNumber = versionNumber;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUatAt() {
+        return uatAt;
+    }
+
+    public void setUatAt(LocalDateTime uatAt) {
+        this.uatAt = uatAt;
+    }
+
+    public LocalDateTime getArchivedAt() {
+        return archivedAt;
+    }
+
+    public void setArchivedAt(LocalDateTime archivedAt) {
+        this.archivedAt = archivedAt;
+    }
 
     @PrePersist
     protected void onCreate() {

@@ -16,10 +16,12 @@ public class VersionService {
 
     private final VersionRepository versionRepository;
     private final StepRepository stepRepository;
+    private final StepService stepService;
 
-    public VersionService(VersionRepository versionRepository, StepRepository stepRepository) {
+    public VersionService(VersionRepository versionRepository, StepRepository stepRepository, StepService stepService) {
         this.versionRepository = versionRepository;
         this.stepRepository = stepRepository;
+        this.stepService = stepService;
     }
 
     public VersionResponse createVersion(CreateVersionRequest request) {
@@ -141,5 +143,15 @@ public class VersionService {
                 version.getArchivedAt(),
                 stepCount,
                 newStepCount);
+    }
+
+    @Transactional
+    public void deleteVersion(Long id) {
+        // 通过StepService能够同时删除数据库记录和物理文件
+        stepService.deleteStepsByVersion(id);
+
+        Version version = versionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("版本不存在"));
+        versionRepository.delete(version);
     }
 }

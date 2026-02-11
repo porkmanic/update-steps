@@ -271,4 +271,25 @@ public class StepService {
                 attachment.getFileSize(),
                 attachment.getCreatedAt());
     }
+
+    public void deleteStepsByVersion(Long versionId) {
+        Version version = versionRepository.findById(versionId)
+                .orElseThrow(() -> new RuntimeException("版本不存在"));
+
+        List<Step> steps = stepRepository.findByVersionOrderByCreatedAtDesc(version);
+        for (Step step : steps) {
+            // 删除附件文件
+            if (step.getAttachments() != null) {
+                for (Attachment attachment : step.getAttachments()) {
+                    try {
+                        Files.deleteIfExists(Paths.get(attachment.getFilepath()));
+                    } catch (IOException e) {
+                        // 忽略删除失败
+                    }
+                }
+            }
+        }
+
+        stepRepository.deleteAll(steps);
+    }
 }

@@ -90,4 +90,14 @@ public class VersionController {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteVersion(@PathVariable Long id) {
+        try {
+            versionService.deleteVersion(id);
+            return ResponseEntity.ok(ApiResponse.success("版本已删除", null));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
 }

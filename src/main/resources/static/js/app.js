@@ -116,6 +116,9 @@ function setupEventListeners() {
     // 归档按钮
     document.getElementById('archive-btn').addEventListener('click', handleArchiveToggle);
 
+    // 删除版本按钮
+    document.getElementById('delete-version-btn').addEventListener('click', handleDeleteVersion);
+
     // 模态框关闭
     document.getElementById('modal-close').addEventListener('click', closeModal);
     document.getElementById('modal-overlay').addEventListener('click', (e) => {
@@ -730,6 +733,48 @@ async function handleArchiveToggle() {
         document.getElementById('version-detail-view').classList.add('hidden');
         document.getElementById('versions-view').classList.remove('hidden');
         loadVersions();
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+// 删除版本
+async function handleDeleteVersion() {
+    if (!state.currentVersion) return;
+
+    const msg = state.currentVersion.status === 'ARCHIVED'
+        ? '确定要删除该历史版本吗？\n删除后将无法恢复，且所有关联的步骤和附件都将永久删除。'
+        : '确定要删除该版本吗？\n删除后将无法恢复，且所有关联的步骤和附件都将永久删除。';
+
+    if (!confirm(msg)) return;
+
+    try {
+        await api(`/versions/${state.currentVersion.id}`, { method: 'DELETE' });
+        showToast('版本已删除', 'success');
+
+        // 返回列表
+        document.getElementById('version-detail-view').classList.add('hidden');
+        // 如果是在查看归档版本时删除，应该返回归档列表？
+        // 但目前逻辑是统一返回主视图（开发中版本），或者根据 previous view？
+        // 简单处理：如果当前是归档状态，刷新归档列表并显示归档视图
+        // 但 openVersion 时 hides other views.
+
+        // 简单起见，统一返回主页，用户如果要看历史需重新点击
+        document.getElementById('versions-view').classList.remove('hidden');
+        // 既然 loadVersions 是加载开发中版本，那么如果删除了归档版本，回到开发中列表也可以。
+        // 为了体验更好，可以 check status
+
+        if (state.currentVersion.status === 'ARCHIVED') {
+            document.getElementById('versions-view').classList.add('hidden');
+            document.getElementById('archived-view').classList.remove('hidden');
+            loadArchivedVersions();
+        } else {
+            loadVersions();
+        }
+
+        // 清除保存的ID
+        sessionStorage.removeItem('currentVersionId');
+
     } catch (error) {
         showToast(error.message, 'error');
     }
