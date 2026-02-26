@@ -425,7 +425,7 @@ function renderSteps() {
                     <div class="step-attachments">
                         <div class="attachment-list">
                             ${step.attachments.map(att => `
-                                <a href="${att.url}" target="_blank" class="attachment-item">
+                                <a href="${att.filepath}" target="_blank" class="attachment-item">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                                     </svg>
@@ -979,7 +979,7 @@ function renderExistingAttachments() {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
                         <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                     </svg>
-                    <a href="${att.url}" target="_blank" style="flex: 1; color: var(--text-primary);">${att.filename}</a>
+                    <a href="${att.filepath}" target="_blank" style="flex: 1; color: var(--text-primary);">${att.filename}</a>
                     <button type="button" class="btn btn-sm btn-ghost" onclick="markAttachmentForDelete(${att.id})" style="padding: 4px 8px; color: var(--error);">
                         ✕
                     </button>
