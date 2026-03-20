@@ -400,7 +400,7 @@ function renderSteps() {
 
     container.innerHTML = filteredSteps.map(step => {
         // 可编辑条件：本人创建或管理员 + 未锁定 + 未归档 + UAT未确认执行
-        const canEdit = state.currentVersion.status !== 'ARCHIVED' && 
+        const canEdit = state.currentVersion.status !== 'ARCHIVED' &&
             (isAdmin || (step.userId === state.user.id && !step.locked && !step.uatConfirmed));
         const canDelete = canEdit;
 
@@ -654,7 +654,7 @@ function showCreateUserModal() {
                     <option value="ADMIN">管理员</option>
                 </select>
             </div>
-            <p style="color: var(--text-muted); font-size: 0.875rem;">初始密码：nbcb,111</p>
+            <p style="color: var(--text-muted); font-size: 0.875rem;">初始密码：fjh,111</p>
         </form>
     `, `
         <button class="btn btn-secondary" onclick="closeModal()">取消</button>
@@ -673,7 +673,7 @@ async function createUser() {
             body: JSON.stringify({ username, name, role })
         });
         closeModal();
-        showToast('用户创建成功，初始密码为 nbcb,111', 'success');
+        showToast('用户创建成功，初始密码为 fjh,111', 'success');
         loadUsers();
     } catch (error) {
         showToast(error.message, 'error');
@@ -686,7 +686,7 @@ async function resetPassword(userId) {
 
     try {
         await api(`/users/${userId}/reset-password`, { method: 'POST' });
-        showToast('密码已重置为 nbcb,111', 'success');
+        showToast('密码已重置为 fjh,111', 'success');
     } catch (error) {
         showToast(error.message, 'error');
     }

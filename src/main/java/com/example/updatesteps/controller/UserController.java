@@ -28,7 +28,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponse>> createUser(@Valid @RequestBody CreateUserRequest request) {
         try {
             UserResponse response = userService.createUser(request);
-            return ResponseEntity.ok(ApiResponse.success("用户创建成功，初始密码为 nbcb,111", response));
+            return ResponseEntity.ok(ApiResponse.success("用户创建成功，初始密码为 fjh,111", response));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
@@ -48,7 +48,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<Void>> resetPassword(@PathVariable Long id) {
         try {
             userService.resetPassword(id);
-            return ResponseEntity.ok(ApiResponse.success("密码已重置为 nbcb,111", null));
+            return ResponseEntity.ok(ApiResponse.success("密码已重置为 fjh,111", null));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }

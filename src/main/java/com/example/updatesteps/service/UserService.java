@@ -70,7 +70,7 @@ public class UserService {
 
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode("nbcb,111"));
+        user.setPassword(passwordEncoder.encode("fjh,111"));
         user.setName(request.getName());
 
         // 支持选择角色
@@ -104,7 +104,7 @@ public class UserService {
     public void resetPassword(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("用户不存在"));
-        user.setPassword(passwordEncoder.encode("nbcb,111"));
+        user.setPassword(passwordEncoder.encode("fjh,111"));
         userRepository.save(user);
     }
 

@@ -17,7 +17,7 @@ app:
     secret: updatesteps-jwt-secret-key-2024-production
     expiration: 86400000
   admin:
-    password: nbcb,111
+    password: fjh,111
 
 server:
   port: 8080
