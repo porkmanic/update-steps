@@ -400,7 +400,8 @@ function renderSteps() {
 
     container.innerHTML = filteredSteps.map(step => {
         // 可编辑条件：本人创建或管理员 + 未锁定 + 未归档 + UAT未确认执行
-        const canEdit = (step.userId === state.user.id || isAdmin) && !step.locked && !step.uatConfirmed && state.currentVersion.status !== 'ARCHIVED';
+        const canEdit = state.currentVersion.status !== 'ARCHIVED' && 
+            (isAdmin || (step.userId === state.user.id && !step.locked && !step.uatConfirmed));
         const canDelete = canEdit;
 
         return `

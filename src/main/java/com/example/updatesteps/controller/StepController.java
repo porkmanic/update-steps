@@ -146,4 +146,25 @@ public class StepController {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
+
+    @GetMapping("/attachments/{id}/download")
+    public ResponseEntity<org.springframework.core.io.Resource> downloadAttachment(@PathVariable Long id) {
+        try {
+            com.example.updatesteps.entity.Attachment attachment = stepService.getAttachment(id);
+            java.nio.file.Path filePath = java.nio.file.Paths.get(attachment.getFilepath());
+            org.springframework.core.io.Resource resource = new org.springframework.core.io.UrlResource(filePath.toUri());
+
+            if (resource.exists() || resource.isReadable()) {
+                String encodedFilename = java.net.URLEncoder.encode(attachment.getFilename(), "UTF-8").replaceAll("\\+", "%20");
+                return ResponseEntity.ok()
+                        .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + attachment.getFilename() + "\"; filename*=UTF-8''" + encodedFilename)
+                        .header(org.springframework.http.HttpHeaders.CONTENT_TYPE, attachment.getFileType() != null ? attachment.getFileType() : "application/octet-stream")
+                        .body(resource);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

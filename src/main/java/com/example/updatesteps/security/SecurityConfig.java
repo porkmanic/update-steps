@@ -30,7 +30,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/login", "/", "/index.html", "/css/**", "/js/**", "/lib/**",
-                                "/uploads/**")
+                                "/uploads/**", "/api/steps/attachments/*/download")
                         .permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/versions/**").authenticated()
                         .requestMatchers(HttpMethod.POST, "/api/versions/**").hasRole("ADMIN")

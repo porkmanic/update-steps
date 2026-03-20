@@ -67,7 +67,7 @@ public class StepService {
         }
 
         // 检查锁定状态或UAT确认状态
-        if (step.getLocked() || Boolean.TRUE.equals(step.getUatConfirmed())) {
+        if (user.getRole() != User.Role.ADMIN && (step.getLocked() || Boolean.TRUE.equals(step.getUatConfirmed()))) {
             throw new RuntimeException("UAT执行后的步骤不能修改");
         }
 
@@ -92,7 +92,7 @@ public class StepService {
         }
 
         // 检查锁定状态或UAT确认状态
-        if (step.getLocked() || Boolean.TRUE.equals(step.getUatConfirmed())) {
+        if (user.getRole() != User.Role.ADMIN && (step.getLocked() || Boolean.TRUE.equals(step.getUatConfirmed()))) {
             throw new RuntimeException("UAT执行后的步骤不能删除");
         }
 
@@ -182,7 +182,7 @@ public class StepService {
         }
 
         // 检查锁定状态
-        if (step.getLocked()) {
+        if (user.getRole() != User.Role.ADMIN && step.getLocked()) {
             throw new RuntimeException("UAT执行后的步骤不能添加附件");
         }
 
@@ -228,7 +228,7 @@ public class StepService {
         }
 
         // 检查锁定状态
-        if (step.getLocked()) {
+        if (user.getRole() != User.Role.ADMIN && step.getLocked()) {
             throw new RuntimeException("UAT执行后的步骤不能删除附件");
         }
 
@@ -237,6 +237,11 @@ public class StepService {
 
         // 删除记录
         attachmentRepository.delete(attachment);
+    }
+
+    public Attachment getAttachment(Long id) {
+        return attachmentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("附件不存在"));
     }
 
     private StepResponse toStepResponse(Step step) {
@@ -266,7 +271,7 @@ public class StepService {
         return new AttachmentResponse(
                 attachment.getId(),
                 attachment.getFilename(),
-                "/uploads/" + Paths.get(attachment.getFilepath()).getFileName().toString(),
+                "/api/steps/attachments/" + attachment.getId() + "/download",
                 attachment.getFileType(),
                 attachment.getFileSize(),
                 attachment.getCreatedAt());
