@@ -7,7 +7,7 @@
     <title>版本更新步骤管理系统</title>
     <link rel="stylesheet" href="/css/style.css">
     <!-- Google Fonts Inter removed for offline support -->
-    <link href="/lib/quill.snow.css" rel="stylesheet">
+    <link href="/lib/wangeditor.css" rel="stylesheet">
 </head>
 
 <body>
@@ -158,6 +158,18 @@
                                     <span class="toggle-slider"></span>
                                     只看自己
                                 </label>
+                                <label class="toggle-switch"
+                                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.875rem; color: var(--text-secondary);">
+                                    <input type="checkbox" id="filter-uat-unexecuted" onchange="toggleUatUnexecutedFilter()">
+                                    <span class="toggle-slider"></span>
+                                    UAT未执行
+                                </label>
+                                <label class="toggle-switch"
+                                    style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.875rem; color: var(--text-secondary);">
+                                    <input type="checkbox" id="filter-prod-unexecuted" onchange="toggleProdUnexecutedFilter()">
+                                    <span class="toggle-slider"></span>
+                                    生产未执行
+                                </label>
                             </div>
                             <button class="btn btn-primary" id="add-step-btn">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -188,7 +200,7 @@
     <!-- Toast通知 - 移到右下角 -->
     <div id="toast-container" class="toast-bottom-right"></div>
 
-    <script src="/lib/quill.min.js"></script>
+    <script src="/lib/wangeditor.min.js"></script>
     <script src="/js/app.js"></script>
 </body>
 

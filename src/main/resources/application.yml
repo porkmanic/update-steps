@@ -18,7 +18,7 @@ spring:
 app:
   jwt:
     secret: "UpdateStepsSecretKey2024VeryLongSecretKeyForJWTSigningNeedToBeAtLeast256Bits"
-    expiration: 86400000
+    expiration: 864000000
   upload:
     path: ./uploads
   admin:

@@ -7,12 +7,26 @@ const state = {
     archivedVersions: [],
     users: [],
     steps: [],
-    filterMySteps: false // 只看自己筛选状态
+    filterMySteps: false, // 只看自己筛选状态
+    filterUatUnexecuted: false, // UAT未执行筛选
+    filterProdUnexecuted: false // 生产未执行筛选
 };
 
 // 切换只看自己筛选
 function toggleMyStepsFilter() {
     state.filterMySteps = document.getElementById('filter-my-steps').checked;
+    renderSteps();
+}
+
+// 切换UAT未执行筛选
+function toggleUatUnexecutedFilter() {
+    state.filterUatUnexecuted = document.getElementById('filter-uat-unexecuted').checked;
+    renderSteps();
+}
+
+// 切换生产未执行筛选
+function toggleProdUnexecutedFilter() {
+    state.filterProdUnexecuted = document.getElementById('filter-prod-unexecuted').checked;
     renderSteps();
 }
 
@@ -121,9 +135,6 @@ function setupEventListeners() {
 
     // 模态框关闭
     document.getElementById('modal-close').addEventListener('click', closeModal);
-    document.getElementById('modal-overlay').addEventListener('click', (e) => {
-        if (e.target === e.currentTarget) closeModal();
-    });
 }
 
 // 登录处理
@@ -382,7 +393,13 @@ function renderSteps() {
     // 应用筛选
     let filteredSteps = state.steps;
     if (state.filterMySteps) {
-        filteredSteps = state.steps.filter(step => step.userId === state.user.id);
+        filteredSteps = filteredSteps.filter(step => step.userId === state.user.id);
+    }
+    if (state.filterUatUnexecuted) {
+        filteredSteps = filteredSteps.filter(step => !step.uatConfirmed);
+    }
+    if (state.filterProdUnexecuted) {
+        filteredSteps = filteredSteps.filter(step => !step.prodConfirmed);
     }
 
     if (filteredSteps.length === 0) {
@@ -421,12 +438,12 @@ function renderSteps() {
                         ${step.prodConfirmed ? '<span class="status-badge" style="background: rgba(99, 102, 241, 0.15); color: #6366f1;">生产已执行</span>' : ''}
                     </div>
                 </div>
-                <div class="step-content">${step.content}</div>
+                <div class="step-content">${step.content ? step.content.replace(/<p\b/g, '<div').replace(/<\/p>/g, '</div>') : ''}</div>
                 ${step.attachments && step.attachments.length > 0 ? `
                     <div class="step-attachments">
                         <div class="attachment-list">
                             ${step.attachments.map(att => `
-                                <a href="${att.filepath}" target="_blank" class="attachment-item">
+                                <a href="${att.filepath}" target="_blank" download="${att.filename}" class="attachment-item">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                                     </svg>
@@ -553,6 +570,10 @@ function showModal(title, body, footer, isLarge = false) {
 
 function closeModal() {
     document.getElementById('modal-overlay').classList.add('hidden');
+    if (typeof editorInstance !== 'undefined' && editorInstance) {
+        editorInstance.destroy();
+        editorInstance = null;
+    }
 }
 
 // 修改密码模态框
@@ -782,7 +803,7 @@ async function handleDeleteVersion() {
 }
 
 // 添加步骤模态框
-let quillEditor = null;
+let editorInstance = null;
 let pendingFiles = []; // 待上传的文件
 let existingAttachments = []; // 编辑时的现有附件
 let attachmentsToDelete = []; // 要删除的附件ID
@@ -793,36 +814,43 @@ function showAddStepModal() {
     attachmentsToDelete = [];
 
     showModal('添加更新步骤', `
-        <div class="editor-container">
-            <div id="step-editor"></div>
+        <div class="editor-container" style="border: 1px solid var(--border-color); z-index: 100;">
+            <div id="toolbar-container" style="border-bottom: 1px solid var(--border-color);"></div>
+            <div id="step-editor" style="height: 300px; overflow-y: hidden;"></div>
         </div>
         <div class="attachments-section" style="margin-top: 16px;">
-            <div class="file-upload-area" onclick="document.getElementById('attachment-input').click()">
+            <div id="pending-files-list"></div>
+            <div class="file-upload-area" onclick="document.getElementById('attachment-input').click()" style="margin-top: 12px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                 </svg>
                 <p class="file-upload-text">点击上传附件</p>
             </div>
             <input type="file" id="attachment-input" style="display: none" multiple onchange="handleFileSelect(event)">
-            <div id="pending-files-list" style="margin-top: 12px;"></div>
         </div>
     `, `
         <button class="btn btn-secondary" onclick="closeModal()">取消</button>
         <button class="btn btn-primary" onclick="saveStep()">保存</button>
     `, true);
 
-    quillEditor = new Quill('#step-editor', {
-        theme: 'snow',
-        placeholder: '请输入更新步骤内容...',
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                ['link', 'image'],
-                ['clean']
-            ]
-        }
-    });
+    setTimeout(() => {
+        const { createEditor, createToolbar } = window.wangEditor;
+        
+        editorInstance = createEditor({
+            selector: '#step-editor',
+            html: '<p><br></p>',
+            config: {
+                placeholder: '请输入更新步骤内容...',
+            },
+            mode: 'default'
+        });
+        
+        createToolbar({
+            editor: editorInstance,
+            selector: '#toolbar-container',
+            mode: 'default'
+        });
+    }, 10);
 }
 
 // 处理文件选择 - 即时显示
@@ -875,7 +903,7 @@ function formatFileSize(bytes) {
 }
 
 async function saveStep() {
-    const content = quillEditor.root.innerHTML;
+    const content = editorInstance.getHtml();
 
     if (content === '<p><br></p>' || !content.trim()) {
         showToast('请输入步骤内容', 'warning');
@@ -923,11 +951,13 @@ async function editStep(stepId) {
     attachmentsToDelete = [];
 
     showModal('编辑更新步骤', `
-        <div class="editor-container">
-            <div id="step-editor"></div>
+        <div class="editor-container" style="border: 1px solid var(--border-color); z-index: 100;">
+            <div id="toolbar-container" style="border-bottom: 1px solid var(--border-color);"></div>
+            <div id="step-editor" style="height: 300px; overflow-y: hidden;"></div>
         </div>
         <div class="attachments-section" style="margin-top: 16px;">
             <div id="existing-attachments-list"></div>
+            <div id="pending-files-list" style="margin-top: 12px;"></div>
             <div class="file-upload-area" onclick="document.getElementById('attachment-input').click()" style="margin-top: 12px;">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
@@ -935,26 +965,30 @@ async function editStep(stepId) {
                 <p class="file-upload-text">点击添加更多附件</p>
             </div>
             <input type="file" id="attachment-input" style="display: none" multiple onchange="handleFileSelect(event)">
-            <div id="pending-files-list" style="margin-top: 12px;"></div>
         </div>
     `, `
         <button class="btn btn-secondary" onclick="closeModal()">取消</button>
         <button class="btn btn-primary" onclick="updateStep(${stepId})">保存</button>
     `, true);
 
-    quillEditor = new Quill('#step-editor', {
-        theme: 'snow',
-        modules: {
-            toolbar: [
-                ['bold', 'italic', 'underline'],
-                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                ['link', 'image'],
-                ['clean']
-            ]
-        }
-    });
-
-    quillEditor.root.innerHTML = step.content;
+    setTimeout(() => {
+        const { createEditor, createToolbar } = window.wangEditor;
+        
+        editorInstance = createEditor({
+            selector: '#step-editor',
+            html: step.content || '<p><br></p>',
+            config: {
+                placeholder: '请输入更新步骤内容...',
+            },
+            mode: 'default'
+        });
+        
+        createToolbar({
+            editor: editorInstance,
+            selector: '#toolbar-container',
+            mode: 'default'
+        });
+    }, 10);
 
     // 渲染现有附件
     renderExistingAttachments();
@@ -980,7 +1014,7 @@ function renderExistingAttachments() {
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width: 16px; height: 16px;">
                         <path d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"/>
                     </svg>
-                    <a href="${att.filepath}" target="_blank" style="flex: 1; color: var(--text-primary);">${att.filename}</a>
+                    <a href="${att.filepath}" target="_blank" download="${att.filename}" style="flex: 1; color: var(--text-primary);">${att.filename}</a>
                     <button type="button" class="btn btn-sm btn-ghost" onclick="markAttachmentForDelete(${att.id})" style="padding: 4px 8px; color: var(--error);">
                         ✕
                     </button>
@@ -997,7 +1031,7 @@ function markAttachmentForDelete(attachmentId) {
 }
 
 async function updateStep(stepId) {
-    const content = quillEditor.root.innerHTML;
+    const content = editorInstance.getHtml();
 
     try {
         // 更新步骤内容

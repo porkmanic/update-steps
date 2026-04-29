@@ -558,6 +558,11 @@ body {
     line-height: 1.8;
 }
 
+.step-content p {
+    margin: 0;
+    padding: 0;
+}
+
 .step-content img {
     max-width: 100%;
     border-radius: var(--radius-md);
@@ -717,62 +722,19 @@ body {
     background: rgba(255, 255, 255, 0.02);
 }
 
-/* === Quill Editor === */
+/* === WangEditor === */
 .editor-container {
     background: var(--bg-tertiary);
     border-radius: var(--radius-md);
     overflow: hidden;
-}
-
-.ql-toolbar {
-    background: var(--bg-secondary) !important;
-    border: none !important;
-    border-bottom: 1px solid var(--border-color) !important;
-}
-
-.ql-toolbar button,
-.ql-toolbar .ql-picker {
-    color: var(--text-secondary) !important;
-}
-
-.ql-toolbar button:hover,
-.ql-toolbar button.ql-active {
-    color: var(--accent-primary) !important;
-}
-
-.ql-toolbar .ql-stroke {
-    stroke: var(--text-secondary) !important;
-}
-
-.ql-toolbar button:hover .ql-stroke,
-.ql-toolbar button.ql-active .ql-stroke {
-    stroke: var(--accent-primary) !important;
-}
-
-.ql-toolbar .ql-fill {
-    fill: var(--text-secondary) !important;
-}
-
-.ql-toolbar button:hover .ql-fill,
-.ql-toolbar button.ql-active .ql-fill {
-    fill: var(--accent-primary) !important;
-}
-
-.ql-container {
-    border: none !important;
-    font-family: 'Inter', sans-serif !important;
-}
-
-.ql-editor {
-    min-height: 200px;
-    color: var(--text-primary) !important;
-    font-size: 1rem;
-    line-height: 1.8;
-}
-
-.ql-editor.ql-blank::before {
-    color: var(--text-muted) !important;
-    font-style: normal !important;
+    --w-e-textarea-bg-color: var(--bg-tertiary);
+    --w-e-textarea-color: var(--text-primary);
+    --w-e-toolbar-bg-color: var(--bg-secondary);
+    --w-e-toolbar-color: var(--text-primary);
+    --w-e-toolbar-active-bg-color: var(--bg-tertiary);
+    --w-e-toolbar-active-color: var(--accent-primary);
+    --w-e-toolbar-disabled-color: var(--text-muted);
+    --w-e-toolbar-border-color: var(--border-color);
 }
 
 /* === File Upload === */

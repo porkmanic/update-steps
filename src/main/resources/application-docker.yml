@@ -15,7 +15,7 @@ app:
     path: /data/uploads
   jwt:
     secret: updatesteps-jwt-secret-key-2024-production
-    expiration: 86400000
+    expiration: 864000000
   admin:
     password: fjh,111
 
